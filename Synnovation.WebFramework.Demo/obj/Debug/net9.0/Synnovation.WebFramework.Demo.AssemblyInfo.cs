@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Synnovation.WebFramework.Demo")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5cbc1dddfd50af6644302b1142c88f84e99b807f")]
 [assembly: System.Reflection.AssemblyProductAttribute("Synnovation.WebFramework.Demo")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Synnovation.WebFramework.Demo")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
