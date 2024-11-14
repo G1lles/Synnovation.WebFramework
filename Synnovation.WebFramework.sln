@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synnovation.WebFramework", "Synnovation.WebFramework\Synnovation.WebFramework.csproj", "{498519A8-5152-474F-9DE8-9FFA623970B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synnovation.WebFramework.Demo", "Synnovation.WebFramework.Demo\Synnovation.WebFramework.Demo.csproj", "{71810CF6-E2A6-4579-91E0-9F8E9F41EC3A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{498519A8-5152-474F-9DE8-9FFA623970B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{498519A8-5152-474F-9DE8-9FFA623970B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{498519A8-5152-474F-9DE8-9FFA623970B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{498519A8-5152-474F-9DE8-9FFA623970B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71810CF6-E2A6-4579-91E0-9F8E9F41EC3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71810CF6-E2A6-4579-91E0-9F8E9F41EC3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71810CF6-E2A6-4579-91E0-9F8E9F41EC3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71810CF6-E2A6-4579-91E0-9F8E9F41EC3A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

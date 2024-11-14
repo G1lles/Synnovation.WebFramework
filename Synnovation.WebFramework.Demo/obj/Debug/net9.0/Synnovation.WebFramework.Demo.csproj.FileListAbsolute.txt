@@ -1,0 +1,14 @@
+C:\Cloud\School\2024-2025\Programmeren\Synnovation.WebFramework\Synnovation.WebFramework.Demo\obj\Debug\net9.0\Synnovation.WebFramework.Demo.GeneratedMSBuildEditorConfig.editorconfig
+C:\Cloud\School\2024-2025\Programmeren\Synnovation.WebFramework\Synnovation.WebFramework.Demo\obj\Debug\net9.0\Synnovation.WebFramework.Demo.AssemblyInfoInputs.cache
+C:\Cloud\School\2024-2025\Programmeren\Synnovation.WebFramework\Synnovation.WebFramework.Demo\obj\Debug\net9.0\Synnovation.WebFramework.Demo.AssemblyInfo.cs
+C:\Cloud\School\2024-2025\Programmeren\Synnovation.WebFramework\Synnovation.WebFramework.Demo\obj\Debug\net9.0\Synnovation.WebFramework.Demo.csproj.CoreCompileInputs.cache
+C:\Cloud\School\2024-2025\Programmeren\Synnovation.WebFramework\Synnovation.WebFramework.Demo\bin\Debug\net9.0\Synnovation.WebFramework.Demo.exe
+C:\Cloud\School\2024-2025\Programmeren\Synnovation.WebFramework\Synnovation.WebFramework.Demo\bin\Debug\net9.0\Synnovation.WebFramework.Demo.deps.json
+C:\Cloud\School\2024-2025\Programmeren\Synnovation.WebFramework\Synnovation.WebFramework.Demo\bin\Debug\net9.0\Synnovation.WebFramework.Demo.runtimeconfig.json
+C:\Cloud\School\2024-2025\Programmeren\Synnovation.WebFramework\Synnovation.WebFramework.Demo\bin\Debug\net9.0\Synnovation.WebFramework.Demo.dll
+C:\Cloud\School\2024-2025\Programmeren\Synnovation.WebFramework\Synnovation.WebFramework.Demo\bin\Debug\net9.0\Synnovation.WebFramework.Demo.pdb
+C:\Cloud\School\2024-2025\Programmeren\Synnovation.WebFramework\Synnovation.WebFramework.Demo\obj\Debug\net9.0\Synnovation.WebFramework.Demo.dll
+C:\Cloud\School\2024-2025\Programmeren\Synnovation.WebFramework\Synnovation.WebFramework.Demo\obj\Debug\net9.0\refint\Synnovation.WebFramework.Demo.dll
+C:\Cloud\School\2024-2025\Programmeren\Synnovation.WebFramework\Synnovation.WebFramework.Demo\obj\Debug\net9.0\Synnovation.WebFramework.Demo.pdb
+C:\Cloud\School\2024-2025\Programmeren\Synnovation.WebFramework\Synnovation.WebFramework.Demo\obj\Debug\net9.0\Synnovation.WebFramework.Demo.genruntimeconfig.cache
+C:\Cloud\School\2024-2025\Programmeren\Synnovation.WebFramework\Synnovation.WebFramework.Demo\obj\Debug\net9.0\ref\Synnovation.WebFramework.Demo.dll
