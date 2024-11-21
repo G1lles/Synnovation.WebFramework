@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ Title }}</title>
+</head>
+<body>
+<h1>{{ Title }}</h1>
+<p>{{ Message }}</p>
+
+{{#if ShowItems}}
+<h2>Features:</h2>
+<ul>
+    {{#foreach Item in Items}}
+    <li>{{ Item }}</li>
+    {{/foreach}}
+</ul>
+{{/if}}
+</body>
+</html>
