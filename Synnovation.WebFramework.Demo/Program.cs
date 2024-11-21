@@ -17,7 +17,7 @@ class Program
         builder
             .ConfigureRoutes(routes =>
             {
-                routes.AddRoute("/hello", "GET", typeof(HelloController), nameof(HelloController.Get));
+                routes.AddRoute("/", "GET", typeof(HelloController), nameof(HelloController.Get));
                 routes.AddRoute("/product/{id}", "GET", typeof(ProductController), nameof(ProductController.GetProduct));
             })
             .Run();
