@@ -30,10 +30,7 @@ public class HttpListenerService
             try
             {
                 // Middleware pipeline invocation
-                response = await _middleware.InvokeAsync(request, async context =>
-                {
-                    return RouteHandler.HandleRequest(context);
-                });
+                response = await _middleware.InvokeAsync(request, context => Task.FromResult(RouteHandler.HandleRequest(context)));
             }
             catch (Exception ex)
             {

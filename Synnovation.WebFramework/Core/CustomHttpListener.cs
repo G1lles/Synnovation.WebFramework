@@ -12,7 +12,7 @@ public class CustomHttpListener
     public CustomHttpListener(int port)
     {
         _port = port;
-        _listener = new TcpListener(System.Net.IPAddress.Any, _port);
+        _listener = new TcpListener(IPAddress.Any, _port);
     }
 
     public void Start()
@@ -26,29 +26,58 @@ public class CustomHttpListener
         while (true)
         {
             var client = await _listener.AcceptTcpClientAsync();
-            _ = Task.Run(() => HandleClientAsync(client, requestHandler));
+            _ = Task.Run(async () => await HandleClientAsync(client, requestHandler));
         }
     }
 
     private async Task HandleClientAsync(TcpClient client, Func<HttpRequest, Task<HttpResponse>> requestHandler)
     {
+        client.ReceiveTimeout = 5000;
+        client.SendTimeout = 5000;
+
         try
         {
-            using var stream = client.GetStream();
+            await using var stream = client.GetStream();
             var buffer = new byte[4096];
-            var bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+            var bytesRead = await stream.ReadAsync(buffer);
+            if (bytesRead == 0)
+            {
+                Console.WriteLine("Received empty request.");
+                return;
+            }
+
             var requestString = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
-            var request = HttpRequest.Parse(requestString);
-            var response = await requestHandler(request);
+            HttpRequest request;
+            try
+            {
+                request = HttpRequest.Parse(requestString);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error parsing request: {ex.Message}");
+                var errorResponse = new HttpResponse(400, "Bad Request");
+                await SendResponseAsync(stream, errorResponse);
+                return;
+            }
 
-            var responseBytes = Encoding.UTF8.GetBytes(response.ToString());
-            await stream.WriteAsync(responseBytes, 0, responseBytes.Length);
+            var response = await requestHandler(request);
+            await SendResponseAsync(stream, response);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error handling client: {ex.Message}");
         }
         finally
         {
             client.Close();
         }
+    }
+
+    private async Task SendResponseAsync(NetworkStream stream, HttpResponse response)
+    {
+        var responseBytes = Encoding.UTF8.GetBytes(response.ToString());
+        await stream.WriteAsync(responseBytes);
     }
 
     public void Stop()

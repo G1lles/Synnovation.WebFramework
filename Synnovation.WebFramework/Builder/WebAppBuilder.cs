@@ -1,6 +1,7 @@
 using Synnovation.WebFramework.Core;
 using Synnovation.WebFramework.Core.Middleware;
 using Synnovation.WebFramework.Routing;
+using System.Reflection;
 
 namespace Synnovation.WebFramework.Builder;
 
@@ -23,6 +24,12 @@ public class WebAppBuilder
     public WebAppBuilder ConfigureRoutes(Action<RouteTable> configureRoutes)
     {
         configureRoutes(RouteTable.Instance);
+        return this;
+    }
+
+    public WebAppBuilder AutoRegisterControllers(Assembly assembly)
+    {
+        RouteScanner.RegisterRoutesFromAssembly(RouteTable.Instance, assembly);
         return this;
     }
 

@@ -9,12 +9,12 @@ public class ServiceCollection : IServiceCollection
 
     public void AddSingleton<TService, TImplementation>() where TImplementation : TService
     {
-        _singletons[typeof(TService)] = Activator.CreateInstance(typeof(TImplementation))!;
+        _singletons[typeof(TService)] = Activator.CreateInstance<TImplementation>()!;
     }
 
     public void AddSingleton<TService>(TService implementation)
     {
-        _singletons[typeof(TService)] = implementation;
+        if (implementation != null) _singletons[typeof(TService)] = implementation;
     }
 
     public TService GetService<TService>()
