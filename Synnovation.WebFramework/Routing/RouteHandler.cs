@@ -44,14 +44,9 @@ public static class RouteHandler
         if (routeSegments.Length != requestSegments.Length)
             return false;
 
-        for (int i = 0; i < routeSegments.Length; i++)
-        {
-            if (routeSegments[i].StartsWith("{") && routeSegments[i].EndsWith("}"))
-                continue; // Path parameter matches
-            if (!string.Equals(routeSegments[i], requestSegments[i], StringComparison.OrdinalIgnoreCase))
-                return false;
-        }
-        return true;
+        return !routeSegments.Where((t, i) =>
+            (!t.StartsWith('{') || !t.EndsWith('}')) &&
+            !string.Equals(t, requestSegments[i], StringComparison.OrdinalIgnoreCase)).Any();
     }
 
     private static object[] BindParameters(RouteConfig route, HttpRequest request)
@@ -60,22 +55,18 @@ public static class RouteHandler
         var routeSegments = route.Path.Split('/');
         var requestSegments = request.Path.Split('/');
 
-        for (int i = 0; i < routeSegments.Length; i++)
+        for (var i = 0; i < routeSegments.Length; i++)
         {
-            if (routeSegments[i].StartsWith("{") && routeSegments[i].EndsWith("}"))
+            if (routeSegments[i].StartsWith('{') && routeSegments[i].EndsWith('}'))
             {
                 parameters.Add(requestSegments[i]);
             }
         }
 
         // Add query parameters if action method defines them
-        foreach (var queryParam in route.ParameterNames)
-        {
-            if (request.QueryParameters.ContainsKey(queryParam))
-            {
-                parameters.Add(request.QueryParameters[queryParam]);
-            }
-        }
+        parameters.AddRange((from queryParam in route.ParameterNames
+            where request.QueryParameters.ContainsKey(queryParam)
+            select request.QueryParameters[queryParam]).Cast<object>());
 
         return parameters.ToArray();
     }

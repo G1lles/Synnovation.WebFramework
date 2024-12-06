@@ -1,9 +1,11 @@
 using Synnovation.WebFramework.Core;
+using Synnovation.WebFramework.Routing;
 
 namespace Synnovation.WebFramework.Demo.Controllers;
 
 public class ProductController : ControllerBase
 {
+    [HttpGet("/product/{id}/{category}")]
     public string GetProduct(string id, string category)
     {
         // Simulate fetching product details

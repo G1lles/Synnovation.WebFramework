@@ -21,7 +21,9 @@ public static class RouteScanner
             foreach (var method in methods)
             {
                 var attribute = method.GetCustomAttribute<HttpVerbAttribute>();
-                routeTable.AddRoute(attribute!.Path, attribute.GetType().Name.Replace("Http", "").Replace("Attribute", "").ToUpper(), controller, method.Name);
+                routeTable.AddRoute(attribute!.Path,
+                    attribute.GetType().Name.Replace("Http", "").Replace("Attribute", "").ToUpper(), controller,
+                    method.Name);
             }
         }
     }

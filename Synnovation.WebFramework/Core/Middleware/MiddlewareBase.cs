@@ -1,14 +1,9 @@
 namespace Synnovation.WebFramework.Core.Middleware;
 
-public abstract class MiddlewareBase
+public abstract class MiddlewareBase(MiddlewareBase? next)
 { 
 
-   public MiddlewareBase? Next { get; set; }
+   public MiddlewareBase? Next { get; set; } = next;
 
-    protected MiddlewareBase(MiddlewareBase? next)
-    {
-        Next = next;
-    }
-
-    public abstract Task<HttpResponse> InvokeAsync(HttpRequest request, Func<HttpRequest, Task<HttpResponse>> next);
+   public abstract Task<HttpResponse> InvokeAsync(HttpRequest request, Func<HttpRequest, Task<HttpResponse>> next);
 }
