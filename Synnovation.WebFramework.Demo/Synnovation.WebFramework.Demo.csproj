@@ -17,5 +17,14 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
-    
+
+    <ItemGroup>
+        <Content Include="wwwroot\**\*" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\fonts\" />
+    </ItemGroup>
+
+
 </Project>

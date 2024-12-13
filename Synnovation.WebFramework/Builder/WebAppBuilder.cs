@@ -45,6 +45,12 @@ public class WebAppBuilder
         return this;
     }
 
+    public WebAppBuilder UseStaticFiles()
+    {
+        _middleware.Use(new StaticFileMiddleware());
+        return this;
+    }
+
     public void Run()
     {
         var listener = new HttpListenerService(_prefixes, _middleware);
