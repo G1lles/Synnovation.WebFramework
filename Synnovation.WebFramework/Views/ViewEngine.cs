@@ -5,7 +5,7 @@ namespace Synnovation.WebFramework.Views;
 public static partial class ViewEngine
 {
     private static readonly string ViewsFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Views");
-    
+
     public static string Render(string viewName, ViewData viewData)
     {
         var viewPath = Path.Combine(ViewsFolder, $"{viewName}.html");
