@@ -16,15 +16,35 @@ public static class RouteScanner
 
         foreach (var controller in controllers)
         {
-            var methods = controller.GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                .Where(method => method.GetCustomAttributes<HttpVerbAttribute>().Any());
+            var methods = controller.GetMethods(BindingFlags.Instance | BindingFlags.Public);
 
             foreach (var method in methods)
             {
-                var attribute = method.GetCustomAttribute<HttpVerbAttribute>();
-                routeTable.AddRoute(attribute!.Path,
-                    attribute.GetType().Name.Replace("Http", "").Replace("Attribute", "").ToUpper(), controller,
-                    method.Name);
+                // Check if the method has an HttpVerbAttribute (e.g., [HttpGet])
+                var httpVerbAttribute = method.GetCustomAttribute<HttpVerbAttribute>();
+
+                string path;
+                string httpMethod;
+
+                if (httpVerbAttribute != null)
+                {
+                    // If an HttpVerbAttribute is present, use its values
+                    path = httpVerbAttribute.Path ?? $"/{method.Name}";
+                    httpMethod = httpVerbAttribute.GetType().Name.Replace("Http", "").Replace("Attribute", "")
+                        .ToUpper();
+                }
+                else
+                {
+                    // If no HttpVerbAttribute, default to the action name as route and assume GET method
+                    path = $"/{method.Name}";
+                    httpMethod = "GET";
+                }
+
+                // Determine if the method requires authorization
+                var requiresAuthorization = method.GetCustomAttribute<AuthorizeAttribute>() != null;
+
+                // Add the route to the RouteTable
+                routeTable.AddRoute(path, httpMethod, controller, method.Name, requiresAuthorization);
             }
         }
     }

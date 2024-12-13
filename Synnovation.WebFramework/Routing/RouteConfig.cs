@@ -11,17 +11,22 @@ public class RouteConfig
     public string ActionName { get; set; }
     public List<string> ParameterNames { get; set; } = [];
 
-    public RouteConfig(string path, string httpMethod, Type controllerType, string actionName)
+    public bool RequiresAuthorization { get; }
+
+
+    public RouteConfig(string path, string httpMethod, Type controllerType, string actionName,
+        bool requiresAuthorization)
     {
         Path = path.ToLowerInvariant();
         HttpMethod = httpMethod.ToUpperInvariant();
         ControllerType = controllerType;
         ActionName = actionName;
+        RequiresAuthorization = requiresAuthorization;
 
         // Extract parameters from path (e.g., /user/{id})
         foreach (var segment in path.Split('/'))
         {
-            if (segment.StartsWith("{") && segment.EndsWith("}"))
+            if (segment.StartsWith('{') && segment.EndsWith('}'))
             {
                 ParameterNames.Add(segment.Trim('{', '}'));
             }

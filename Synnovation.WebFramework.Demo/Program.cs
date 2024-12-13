@@ -12,11 +12,8 @@ internal class Program
         builder
             .AutoRegisterControllers(typeof(Program).Assembly)
             .UseStaticFiles()
-            .ConfigureMiddleware(middleware =>
-            {
-                middleware.Use(new LoggingMiddleware());
-                middleware.Use(new AuthenticationMiddleware());
-            })
+            .UseLoggingMiddleware()
+            .UseAuthenticationMiddleware()
             .Run();
     }
 }

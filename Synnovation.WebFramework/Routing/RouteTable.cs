@@ -13,7 +13,9 @@ public class RouteTable
     /// </summary>
     public List<RouteConfig> Routes { get; } = [];
 
-    private RouteTable() { }
+    private RouteTable()
+    {
+    }
 
     /// <summary>
     /// Adds a new route to the route table.
@@ -22,8 +24,10 @@ public class RouteTable
     /// <param name="httpMethod">The HTTP method (GET, POST, etc.).</param>
     /// <param name="controllerType">The controller type to invoke.</param>
     /// <param name="actionName">The action method to invoke.</param>
-    public void AddRoute(string path, string httpMethod, Type controllerType, string actionName)
+    ///     /// <param name="requiresAuthorization">Indicates whether the route requires authorization.</param>
+    public void AddRoute(string path, string httpMethod, Type controllerType, string actionName,
+        bool requiresAuthorization)
     {
-        Routes.Add(new RouteConfig(path, httpMethod, controllerType, actionName));
+        Routes.Add(new RouteConfig(path, httpMethod, controllerType, actionName, requiresAuthorization));
     }
 }

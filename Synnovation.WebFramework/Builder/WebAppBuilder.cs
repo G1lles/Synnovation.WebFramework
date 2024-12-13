@@ -21,12 +21,6 @@ public class WebAppBuilder
         _prefixes = prefixes;
     }
 
-    public WebAppBuilder ConfigureRoutes(Action<RouteTable> configureRoutes)
-    {
-        configureRoutes(RouteTable.Instance);
-        return this;
-    }
-
     public WebAppBuilder AutoRegisterControllers(Assembly assembly)
     {
         RouteScanner.RegisterRoutesFromAssembly(RouteTable.Instance, assembly);
@@ -42,6 +36,18 @@ public class WebAppBuilder
     public WebAppBuilder UseStaticFiles()
     {
         _middleware.Use(new StaticFileMiddleware());
+        return this;
+    }
+
+    public WebAppBuilder UseLoggingMiddleware()
+    {
+        _middleware.Use(new LoggingMiddleware());
+        return this;
+    }
+
+    public WebAppBuilder UseAuthenticationMiddleware()
+    {
+        _middleware.Use(new AuthenticationMiddleware());
         return this;
     }
 

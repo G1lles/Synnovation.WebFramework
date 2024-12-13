@@ -5,24 +5,27 @@ namespace Synnovation.WebFramework.Core.Middleware;
 /// </summary>
 public class MiddlewarePipeline
 {
-    private MiddlewareBase? _first;
+    private readonly List<MiddlewareBase> _middlewares = [];
 
     public MiddlewarePipeline Use(MiddlewareBase middleware)
     {
-        _first ??= middleware;
+        _middlewares.Add(middleware);
         return this;
     }
 
     public async Task<HttpResponse> InvokeAsync(HttpRequest request, Func<HttpRequest, Task<HttpResponse>> finalHandler)
     {
-        if (_first != null)
+        // Create a middleware chain by linking each middleware to the next
+        var next = finalHandler;
+
+        for (var i = _middlewares.Count - 1; i >= 0; i--)
         {
-            return await _first.InvokeAsync(request, finalHandler);
+            var currentMiddleware = _middlewares[i];
+            var previousNext = next;
+            next = async req => await currentMiddleware.InvokeAsync(req, previousNext);
         }
-        else
-        {
-            // No middleware, directly invoke the final handler
-            return await finalHandler(request);
-        }
+
+        // Invoke the first middleware in the chain
+        return await next(request);
     }
 }
