@@ -1,4 +1,5 @@
 using System.Reflection;
+using Synnovation.WebFramework.Annotations;
 using Synnovation.WebFramework.Core;
 
 namespace Synnovation.WebFramework.Routing;

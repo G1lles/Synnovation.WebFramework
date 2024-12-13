@@ -1,4 +1,4 @@
-namespace Synnovation.WebFramework.Routing;
+namespace Synnovation.WebFramework.Annotations;
 
 /// <summary>
 /// Attribute for HTTP POST requests.

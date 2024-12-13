@@ -1,4 +1,4 @@
-namespace Synnovation.WebFramework.Routing;
+namespace Synnovation.WebFramework.Annotations;
 
 /// <summary>
 /// Base class for HTTP verb attributes.

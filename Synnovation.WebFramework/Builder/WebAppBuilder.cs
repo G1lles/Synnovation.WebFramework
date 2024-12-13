@@ -2,6 +2,7 @@ using Synnovation.WebFramework.Core;
 using Synnovation.WebFramework.Core.Middleware;
 using Synnovation.WebFramework.Routing;
 using System.Reflection;
+using Synnovation.WebFramework.Core.Middleware.Implementations;
 
 namespace Synnovation.WebFramework.Builder;
 
@@ -10,7 +11,6 @@ namespace Synnovation.WebFramework.Builder;
 /// </summary>
 public class WebAppBuilder
 {
-    private readonly IServiceCollection _services = new ServiceCollection();
     private readonly MiddlewarePipeline _middleware = new();
     private readonly string[] _prefixes;
 
@@ -36,12 +36,6 @@ public class WebAppBuilder
     public WebAppBuilder ConfigureMiddleware(Action<MiddlewarePipeline> configureMiddleware)
     {
         configureMiddleware(_middleware);
-        return this;
-    }
-
-    public WebAppBuilder ConfigureServices(Action<IServiceCollection> configureServices)
-    {
-        configureServices(_services);
         return this;
     }
 

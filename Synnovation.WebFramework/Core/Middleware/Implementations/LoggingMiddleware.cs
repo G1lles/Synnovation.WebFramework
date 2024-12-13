@@ -1,9 +1,9 @@
-namespace Synnovation.WebFramework.Core.Middleware;
+namespace Synnovation.WebFramework.Core.Middleware.Implementations;
 
 /// <summary>
 /// Middleware for logging incoming requests and outgoing responses.
 /// </summary>
-public class LoggingMiddleware(MiddlewareBase? next) : MiddlewareBase(next)
+public class LoggingMiddleware : MiddlewareBase
 {
     public override async Task<HttpResponse> InvokeAsync(HttpRequest request, Func<HttpRequest, Task<HttpResponse>> next)
     {

@@ -11,7 +11,7 @@ public class RouteTable
     /// <summary>
     /// List of all registered routes.
     /// </summary>
-    public List<RouteConfig> Routes { get; } = new();
+    public List<RouteConfig> Routes { get; } = [];
 
     private RouteTable() { }
 

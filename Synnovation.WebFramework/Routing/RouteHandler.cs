@@ -64,9 +64,9 @@ public static class RouteHandler
         }
 
         // Add query parameters if action method defines them
-        parameters.AddRange((from queryParam in route.ParameterNames
+        parameters.AddRange(from queryParam in route.ParameterNames
             where request.QueryParameters.ContainsKey(queryParam)
-            select request.QueryParameters[queryParam]).Cast<object>());
+            select request.QueryParameters[queryParam]);
 
         return parameters.ToArray();
     }

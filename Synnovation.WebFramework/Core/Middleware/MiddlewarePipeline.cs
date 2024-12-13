@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
 namespace Synnovation.WebFramework.Core.Middleware;
 
 /// <summary>
@@ -12,19 +9,7 @@ public class MiddlewarePipeline
 
     public MiddlewarePipeline Use(MiddlewareBase middleware)
     {
-        if (_first == null)
-        {
-            _first = middleware;
-        }
-        else
-        {
-            var current = _first;
-            while (current.Next != null)
-            {
-                current = current.Next;
-            }
-            current.Next = middleware;
-        }
+        _first ??= middleware;
         return this;
     }
 

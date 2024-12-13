@@ -1,5 +1,5 @@
+using Synnovation.WebFramework.Annotations;
 using Synnovation.WebFramework.Core;
-using Synnovation.WebFramework.Routing;
 
 namespace Synnovation.WebFramework.Demo.Controllers;
 

@@ -1,12 +1,10 @@
-namespace Synnovation.WebFramework.Core.Middleware;
-
-using System.IO;
+namespace Synnovation.WebFramework.Core.Middleware.Implementations;
 
 public class StaticFileMiddleware : MiddlewareBase
 {
     private readonly string _rootPath;
 
-    public StaticFileMiddleware(MiddlewareBase? next = null) : base(next)
+    public StaticFileMiddleware()
     {
         // Resolve wwwroot to an absolute path based on the application's base directory
         _rootPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot");
@@ -17,7 +15,8 @@ public class StaticFileMiddleware : MiddlewareBase
         }
     }
 
-    public override async Task<HttpResponse> InvokeAsync(HttpRequest request, Func<HttpRequest, Task<HttpResponse>> next)
+    public override async Task<HttpResponse> InvokeAsync(HttpRequest request,
+        Func<HttpRequest, Task<HttpResponse>> next)
     {
         Console.WriteLine($"Request Path: {request.Path}");
 
@@ -40,7 +39,7 @@ public class StaticFileMiddleware : MiddlewareBase
 
     private static string GetContentType(string filePath)
     {
-        var extension = Path.GetExtension(filePath)?.ToLowerInvariant();
+        var extension = Path.GetExtension(filePath).ToLowerInvariant();
         return extension switch
         {
             ".css" => "text/css",
