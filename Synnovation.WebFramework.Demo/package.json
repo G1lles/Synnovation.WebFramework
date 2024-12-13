@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build:css": "npx tailwindcss -i ./wwwroot/styles.css -o ./wwwroot/output.css --watch"
+    "build:css": "npx tailwindcss -i ./wwwroot/styles.css -o ./wwwroot/output.css"
   },
   "dependencies": {
     "autoprefixer": "^10.4.20",

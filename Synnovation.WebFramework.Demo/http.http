@@ -1,3 +1,18 @@
-GET http://localhost:5000/test
+### GET NON EXISTENT (404)
+GET http://localhost:5000/null
 Accept: application/json
-#Authorization: "Bearer Stef"
+
+### GET EXISTING VIEW
+
+GET http://localhost:5000/view
+Accept: application/json
+
+### POST
+
+POST http://localhost:5000/post
+Accept: application/json
+
+### GET AUTH.
+GET http://localhost:5000/protected
+Accept: application/json
+Authorization: "Bearer Token"

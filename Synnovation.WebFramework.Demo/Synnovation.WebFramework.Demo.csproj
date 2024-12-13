@@ -22,9 +22,5 @@
         <Content Include="wwwroot\**\*" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="wwwroot\fonts\" />
-    </ItemGroup>
-
 
 </Project>

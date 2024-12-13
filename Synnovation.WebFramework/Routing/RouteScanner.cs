@@ -20,31 +20,30 @@ public static class RouteScanner
 
             foreach (var method in methods)
             {
-                // Check if the method has an HttpVerbAttribute (e.g., [HttpGet])
-                var httpVerbAttribute = method.GetCustomAttribute<HttpVerbAttribute>();
+                var httpVerbAttributes = method.GetCustomAttributes<HttpVerbAttribute>().ToList();
 
-                string path;
-                string httpMethod;
-
-                if (httpVerbAttribute != null)
+                if (httpVerbAttributes.Count != 0)
                 {
-                    // If an HttpVerbAttribute is present, use its values
-                    path = httpVerbAttribute.Path ?? $"/{method.Name}";
-                    httpMethod = httpVerbAttribute.GetType().Name.Replace("Http", "").Replace("Attribute", "")
-                        .ToUpper();
+                    foreach (var httpVerbAttribute in httpVerbAttributes)
+                    {
+                        var path = httpVerbAttribute.Path;
+
+                        var httpMethod = httpVerbAttribute.GetType().Name
+                            .Replace("Http", "").Replace("Attribute", "").ToUpper();
+
+                        var requiresAuthorization = method.GetCustomAttribute<AuthorizeAttribute>() != null;
+
+                        routeTable.AddRoute(path, httpMethod, controller, method.Name, requiresAuthorization);
+                    }
                 }
                 else
                 {
-                    // If no HttpVerbAttribute, default to the action name as route and assume GET method
-                    path = $"/{method.Name}";
-                    httpMethod = "GET";
+                    var path = $"/{method.Name}";
+                    const string httpMethod = "GET";
+                    var requiresAuthorization = method.GetCustomAttribute<AuthorizeAttribute>() != null;
+
+                    routeTable.AddRoute(path, httpMethod, controller, method.Name, requiresAuthorization);
                 }
-
-                // Determine if the method requires authorization
-                var requiresAuthorization = method.GetCustomAttribute<AuthorizeAttribute>() != null;
-
-                // Add the route to the RouteTable
-                routeTable.AddRoute(path, httpMethod, controller, method.Name, requiresAuthorization);
             }
         }
     }

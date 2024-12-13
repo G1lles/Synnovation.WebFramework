@@ -18,21 +18,18 @@ public class StaticFileMiddleware : MiddlewareBase
     public override async Task<HttpResponse> InvokeAsync(HttpRequest request,
         Func<HttpRequest, Task<HttpResponse>> next)
     {
-        Console.WriteLine($"Request Path: {request.Path}");
-
         // Normalize the path and map it to the wwwroot directory
         var filePath = Path.Combine(_rootPath, request.Path.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
-        Console.WriteLine($"Resolved File Path: {filePath}");
 
         if (File.Exists(filePath))
         {
-            Console.WriteLine($"Serving File: {filePath}");
+            Console.WriteLine($"[{DateTime.Now}] Serving File: {filePath}");
             var contentType = GetContentType(filePath);
             var content = await File.ReadAllTextAsync(filePath);
             return new HttpResponse(200, content) { ContentType = contentType };
         }
 
-        Console.WriteLine($"File Not Found: {filePath}");
+        Console.WriteLine($"[{DateTime.Now}] File Not Found: {filePath}");
         // Pass the request to the next middleware if the file is not found
         return await next(request);
     }
