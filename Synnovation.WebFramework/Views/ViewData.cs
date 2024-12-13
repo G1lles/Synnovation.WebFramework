@@ -12,7 +12,7 @@ public class ViewData
     /// </summary>
     public object Model
     {
-        get => Data.ContainsKey("Model") ? Data["Model"] : null;
+        get => (Data.GetValueOrDefault("Model") ?? null)!;
         set => Data["Model"] = value;
     }
 

@@ -4,23 +4,11 @@ namespace Synnovation.WebFramework.Views;
 
 public static partial class ViewEngine
 {
-    private static string _viewsFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Views");
-
-    public static void Configure(string viewsFolder)
-    {
-        var absolutePath = Path.IsPathRooted(viewsFolder)
-            ? viewsFolder
-            : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, viewsFolder);
-
-        if (!Directory.Exists(absolutePath))
-            throw new DirectoryNotFoundException($"Views folder not found: {absolutePath}");
-
-        _viewsFolder = absolutePath;
-    }
-
+    private static readonly string ViewsFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Views");
+    
     public static string Render(string viewName, ViewData viewData)
     {
-        var viewPath = Path.Combine(_viewsFolder, $"{viewName}.html");
+        var viewPath = Path.Combine(ViewsFolder, $"{viewName}.html");
         if (!File.Exists(viewPath))
             throw new FileNotFoundException($"View '{viewName}' not found at path: {viewPath}");
 

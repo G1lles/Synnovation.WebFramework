@@ -5,6 +5,7 @@ namespace Synnovation.WebFramework.Demo.Controllers;
 
 public class HelloController : ControllerBase
 {
+    
     [HttpGet("/test")]
     public string Get()
     {
