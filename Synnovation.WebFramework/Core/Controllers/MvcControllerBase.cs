@@ -1,6 +1,7 @@
+using Synnovation.WebFramework.Core.Types;
 using Synnovation.WebFramework.Views;
 
-namespace Synnovation.WebFramework.Core;
+namespace Synnovation.WebFramework.Core.Controllers;
 
 /// <summary>
 /// Base class for all MVC controllers.

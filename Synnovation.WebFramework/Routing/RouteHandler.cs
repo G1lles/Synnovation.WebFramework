@@ -2,6 +2,8 @@ using System.Reflection;
 using System.Text.Json;
 using Synnovation.WebFramework.Annotations;
 using Synnovation.WebFramework.Core;
+using Synnovation.WebFramework.Core.Controllers;
+using Synnovation.WebFramework.Core.Types;
 
 namespace Synnovation.WebFramework.Routing
 {

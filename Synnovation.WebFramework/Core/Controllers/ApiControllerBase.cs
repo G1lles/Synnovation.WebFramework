@@ -1,6 +1,7 @@
 using System.Text.Json;
+using Synnovation.WebFramework.Core.Types;
 
-namespace Synnovation.WebFramework.Core;
+namespace Synnovation.WebFramework.Core.Controllers;
 
 public abstract class ApiControllerBase
 {

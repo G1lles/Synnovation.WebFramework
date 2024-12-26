@@ -1,4 +1,4 @@
-namespace Synnovation.WebFramework.Core;
+namespace Synnovation.WebFramework.Core.Types;
 
 /// <summary>
 /// Represents a typesafe result from a controller action.

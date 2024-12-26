@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Synnovation.WebFramework.Core.Types;
 
 namespace Synnovation.WebFramework.Core;
 

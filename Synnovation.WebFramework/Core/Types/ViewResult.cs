@@ -1,6 +1,6 @@
 using Synnovation.WebFramework.Views;
 
-namespace Synnovation.WebFramework.Core;
+namespace Synnovation.WebFramework.Core.Types;
 
 /// <summary>
 /// Renders an HTML view using the ViewEngine.
