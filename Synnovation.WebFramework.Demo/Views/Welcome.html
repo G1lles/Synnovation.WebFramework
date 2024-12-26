@@ -8,7 +8,7 @@
           rel="stylesheet">
     <title>{{ Title }}</title>
 </head>
-<body class="bg-primary text-white">
+<body class="bg-primary text-white flex flex-col p-8">
 <h1 class="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent text-4xl font-bold">
     {{ Title }}
 </h1>
@@ -23,15 +23,17 @@
 </ul>
 {{/if}}
 
-<h1>Create a New User</h1>
-<form method="post" action="/create-user">
-    <label>Name:</label>
-    <input type="text" name="Name"/>
-    <br/><br/>
-    <label>Age:</label>
-    <input type="number" name="Age"/>
-    <br/><br/>
-    <button type="submit">Submit</button>
+<h1 class="text-4xl mt-8 mb-4">Create a New User</h1>
+<form method="post" action="/create-user" class="flex flex-col items-start w-full">
+    <label for="name" class="text-lg font-medium text-right mb-2">Name:</label>
+    <input id="name" type="text" name="Name" class="text-gray-800 border border-gray-300 rounded-md p-2 w-full mb-4"/>
+
+    <label for="age" class="text-lg font-medium text-right mb-2">Age:</label>
+    <input id="age" type="number" name="Age" class="text-gray-800 border border-gray-300 rounded-md p-2 w-full mb-4"/>
+
+    <button type="submit" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-2 px-4 rounded-lg">
+        Submit
+    </button>
 </form>
 
 </body>

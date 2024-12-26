@@ -62,9 +62,9 @@ namespace Synnovation.WebFramework.Routing
             var routeSegments = route.Path.Split('/', StringSplitOptions.RemoveEmptyEntries);
             var requestSegments = request.Path.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
-            int routeParamIndex = 0;  // track how many placeholders we've used
+            var routeParamIndex = 0; // track how many placeholders we've used
 
-            for (int i = 0; i < paramInfos.Length; i++)
+            for (var i = 0; i < paramInfos.Length; i++)
             {
                 var pInfo = paramInfos[i];
                 var hasFromBody = pInfo.GetCustomAttribute<FromBodyAttribute>() != null;
@@ -102,7 +102,7 @@ namespace Synnovation.WebFramework.Routing
                     // routeParamIndex is how many placeholders we've bound so far
                     // so let’s incrementally find the next {placeholder}.
                     var placeholders = routeSegments
-                        .Where(seg => seg.StartsWith("{") && seg.EndsWith("}"))
+                        .Where(seg => seg.StartsWith('{') && seg.EndsWith('}'))
                         .ToList();
 
                     if (routeParamIndex < placeholders.Count)
@@ -129,20 +129,14 @@ namespace Synnovation.WebFramework.Routing
 
         private static object? ConvertToType(string rawValue, Type targetType)
         {
-            if (targetType == typeof(int))
+            if (targetType != typeof(int)) return rawValue;
+            
+            if (int.TryParse(rawValue, out var intVal))
             {
-                if (int.TryParse(rawValue, out int intVal))
-                {
-                    return intVal;
-                }
-                throw new Exception($"Expected an int but got '{rawValue}'");
+                return intVal;
             }
-            else if (targetType == typeof(string))
-            {
-                return rawValue;
-            }
-            // add more conversions as needed
-            return rawValue;
+
+            throw new Exception($"Expected an int but got '{rawValue}'");
         }
 
         private static object? GetDefaultValue(Type t)
@@ -158,16 +152,10 @@ namespace Synnovation.WebFramework.Routing
             if (routeSegs.Length != reqSegs.Length)
                 return false;
 
-            for (int i = 0; i < routeSegs.Length; i++)
-            {
-                // If route seg is {id}, skip direct equality
-                if (routeSegs[i].StartsWith("{") && routeSegs[i].EndsWith("}"))
-                    continue;
-
-                if (!routeSegs[i].Equals(reqSegs[i], StringComparison.OrdinalIgnoreCase))
-                    return false;
-            }
-            return true;
+            return !routeSegs.Where((t, i) =>
+                    (!t.StartsWith('{') || !t.EndsWith('}')) &&
+                    !t.Equals(reqSegs[i], StringComparison.OrdinalIgnoreCase))
+                .Any();
         }
     }
 }

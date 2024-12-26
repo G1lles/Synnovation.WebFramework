@@ -18,25 +18,19 @@ public static partial class ViewEngine
         viewContent = ProcessConditionals(viewContent, viewData);
         viewContent = ProcessLoops(viewContent, viewData);
 
-        foreach (var key in viewData.Data.Keys)
-        {
-            viewContent = viewContent.Replace($"{{{{ {key} }}}}", viewData.Data[key]?.ToString() ?? "");
-        }
-
-        return viewContent;
+        return viewData.Data.Keys.Aggregate(viewContent, (current, key) => current.Replace($"{{{{ {key} }}}}", viewData.Data[key].ToString() ?? ""));
     }
 
     private static string ProcessConditionals(string content, ViewData viewData)
     {
-        var ifRegex = MyRegex1();
+        var ifRegex = ConditionalRegex();
         return ifRegex.Replace(content, match =>
         {
             var condition = match.Groups[1].Value.Trim();
             var innerContent = match.Groups[2].Value;
 
             if (viewData.Data.TryGetValue(condition, out var conditionValue)
-                && conditionValue is bool boolValue
-                && boolValue)
+                && conditionValue is true)
             {
                 return innerContent;
             }
@@ -47,7 +41,7 @@ public static partial class ViewEngine
 
     private static string ProcessLoops(string content, ViewData viewData)
     {
-        var loopRegex = MyRegex();
+        var loopRegex = LoopRegex();
         return loopRegex.Replace(content, match =>
         {
             var itemName = match.Groups[1].Value.Trim();
@@ -72,8 +66,8 @@ public static partial class ViewEngine
     }
 
     [GeneratedRegex(@"{{#foreach (.*?) in (.*?)}}(.*?){{/foreach}}", RegexOptions.Singleline)]
-    private static partial Regex MyRegex();
+    private static partial Regex LoopRegex();
 
     [GeneratedRegex(@"{{#if (.*?)}}(.*?){{/if}}", RegexOptions.Singleline)]
-    private static partial Regex MyRegex1();
+    private static partial Regex ConditionalRegex();
 }

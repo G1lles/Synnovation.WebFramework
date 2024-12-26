@@ -9,8 +9,8 @@ public class RouteConfig
     public string HttpMethod { get; set; }
     public Type ControllerType { get; set; }
     public string ActionName { get; set; }
-    public List<string> ParameterNames { get; set; } = new();
     public bool RequiresAuthorization { get; }
+    private List<string> ParameterNames { get; set; } = [];
 
     public RouteConfig(
         string path,

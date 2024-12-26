@@ -6,37 +6,22 @@ namespace Synnovation.WebFramework.Demo.Controllers;
 public class DemoController : MvcControllerBase
 {
     // GET /Index (no [HttpGet] attribute -> defaults to GET "/Index")
+    [HttpGet("/welcome")]
     public IActionResult Index()
     {
         ViewData["Title"] = "Synnovation .NET";
-        ViewData["Message"] = "This is a dynamically rendered view (from Index).";
+        ViewData["Message"] = "This is a dynamically rendered view.";
         ViewData["ShowItems"] = true;
         ViewData["Items"] = new List<string>
         {
             "Feature 1: Routing",
-            "Feature 2: Middleware",
-            "Feature 3: Views",
-            "Feature 4: DI Container (Scoped)"
+            "Feature 2: Middleware Pipeline",
+            "Feature 3: Controllers",
+            "Feature 4: View Engine",
+            "Feature 5: DI Parameter Binding"
         };
 
-        return View("index");
-    }
-
-    // GET /view
-    [HttpGet("/view")]
-    public IActionResult ViewExample()
-    {
-        ViewData["Title"] = "Synnovation .NET";
-        ViewData["Message"] = "This is a dynamically rendered view (from ViewExample).";
-        ViewData["ShowItems"] = true;
-        ViewData["Items"] = new List<string>
-        {
-            "Feature 1: Routing",
-            "Feature 2: Middleware",
-            "Feature 3: Views"
-        };
-
-        return View("index");
+        return View("Welcome");
     }
 
     [HttpPost("/create-user")]
@@ -60,9 +45,6 @@ public class DemoController : MvcControllerBase
     {
         ViewData["Title"] = "Protected Content";
         ViewData["Message"] = "Only authorized users can see this!";
-        return View("index");
+        return View("Welcome");
     }
 }
-
-// Optional, for demonstration if you want to parse JSON:
-public record MyDataModel(string Name, int Age);

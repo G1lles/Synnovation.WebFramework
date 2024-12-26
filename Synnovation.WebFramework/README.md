@@ -1,172 +1,135 @@
-# Middleware System Documentation
+# Synnovation Web Framework
 
-## Overview
+Synnovation Web Framework is a lightweight, modular .NET web framework designed for educational and practical purposes.
+It offers MVC and REST API capabilities with minimal overhead.
 
-The middleware system in the **Synnovation WebFramework** allows developers to process HTTP requests and responses
-through
-a sequence of modular components, referred to as middleware. Middleware components can handle tasks such as logging,
-static file serving, authentication (not implemented), and more.
+## Features
 
-## How Middleware Works
+- **Routing**: Attribute-based routing (`[HttpGet]`, `[HttpPost]`, etc.).
+- **Middleware Pipeline**: Chainable middleware for logging, authentication, and more.
+- **Controllers**: Supports both MVC (view rendering) and API (JSON-based) controllers.
+- **View Engine**: Simple templating system for rendering HTML views with placeholders.
+- **Parameter Binding**: Automatically bind route parameters and request bodies (`[FromBody]`).
 
-The middleware system uses a **pipeline** design pattern. Each middleware component can:
+## Key Components
 
-1. **Process Incoming Requests:** Perform actions on the HTTP request.
-2. **Call the Next Middleware:** Pass control to the next middleware in the pipeline.
-3. **Process Outgoing Responses:** Perform actions on the HTTP response returned by subsequent middleware.
+### 1. Middleware Pipeline
 
-### Core Components
+Middleware is executed sequentially to process requests. You can create custom middleware by inheriting from
+`MiddlewareBase`.
 
-1. **`MiddlewareBase`**
-    - An abstract base class that all middleware components must inherit.
-    - Defines the contract for middleware with the `InvokeAsync` method.
-
-```csharp
-public abstract class MiddlewareBase
-{
-    public MiddlewareBase? Next { get; set; }
-
-    protected MiddlewareBase(MiddlewareBase? next = null)
-    {
-        Next = next;
-    }
-
-    public abstract Task<HttpResponse> InvokeAsync(HttpRequest request, Func<HttpRequest, Task<HttpResponse>> next);
-}
-```
-
-2. **`MiddlewarePipeline`**
-    - Manages the sequence of middleware components.
-    - Responsible for invoking middleware in the order they are added.
-
-```csharp
-public class MiddlewarePipeline
-{
-    private MiddlewareBase? _first;
-
-    public MiddlewarePipeline Use(MiddlewareBase middleware)
-    {
-        if (_first == null)
-        {
-            _first = middleware;
-        }
-        else
-        {
-            var current = _first;
-            while (current.Next != null)
-            {
-                current = current.Next;
-            }
-            current.Next = middleware;
-        }
-        return this;
-    }
-
-    public async Task<HttpResponse> InvokeAsync(HttpRequest request, Func<HttpRequest, Task<HttpResponse>> finalHandler)
-    {
-        return _first != null ? await _first.InvokeAsync(request, finalHandler) : await finalHandler(request);
-    }
-}
-```
-
-3. **Middleware Implementations**
-    - **`LoggingMiddleware`**: Logs incoming requests and outgoing responses.
-    - **`StaticFileMiddleware`**: Serves static files from the `wwwroot` directory.
-
-### Example Middleware: LoggingMiddleware
+Example:
 
 ```csharp
 public class LoggingMiddleware : MiddlewareBase
 {
-    public LoggingMiddleware(MiddlewareBase? next = null) : base(next) { }
-
     public override async Task<HttpResponse> InvokeAsync(HttpRequest request, Func<HttpRequest, Task<HttpResponse>> next)
     {
-        Console.WriteLine($"[{DateTime.Now}] Incoming request: {request.Method} {request.Path}");
-
+        Console.WriteLine($"Request: {request.Method} {request.Path}");
         var response = await next(request);
-
-        Console.WriteLine($"[{DateTime.Now}] Outgoing response: {response.StatusCode}");
+        Console.WriteLine($"Response: {response.StatusCode}");
         return response;
     }
 }
 ```
 
----
+### 2. Routing
 
-## Adding Middleware to the Pipeline
+Attribute routing maps HTTP methods and paths to controller actions.
 
-To add middleware to the framework, follow these steps:
-
-1. **Create a Middleware Class**
-    - Inherit from `MiddlewareBase`.
-    - Override the `InvokeAsync` method to define custom behavior.
+Example:
 
 ```csharp
-public class CustomMiddleware : MiddlewareBase
+[HttpGet("/api/users")]
+public IActionResult GetAllUsers() => Ok(new[] { "User1", "User2" });
+```
+
+### 3. Controllers
+
+Controllers inherit from either:
+
+* `MvcControllerBase` for rendering views.
+* `ApiControllerBase` for returning JSON or other types.
+
+### 4. View Engine
+
+The `ViewEngine` renders `.html` templates using `ViewData`.
+
+Example `Views/Hello.html`:
+
+````html
+<!DOCTYPE html>
+<html>
+<head><title>{{ Title }}</title></head>
+<body>
+<h1>{{ Message }}</h1>
+</body>
+</html>
+````
+
+Corresponding controller:
+
+````csharp
+public IActionResult Hello()
 {
-    public CustomMiddleware(MiddlewareBase? next = null) : base(next) { }
-
-    public override async Task<HttpResponse> InvokeAsync(HttpRequest request, Func<HttpRequest, Task<HttpResponse>> next)
-    {
-        // Pre-processing logic (e.g., authentication, validation)
-        Console.WriteLine("Custom Middleware: Pre-processing request");
-
-        var response = await next(request);
-
-        // Post-processing logic (e.g., response modification)
-        Console.WriteLine("Custom Middleware: Post-processing response");
-
-        return response;
-    }
+    ViewData["Title"] = "Welcome";
+    ViewData["Message"] = "Hello, world!";
+    return View("Hello");
 }
-```
+````
 
-2. **Register Middleware in the Pipeline**
-    - Use the `MiddlewarePipeline.Use` method to add middleware in sequence.
+### 5. Parameter Binding
 
-```csharp
-var pipeline = new MiddlewarePipeline();
+Supports route placeholders and `[FromBody]` annotations for JSON binding.
 
-pipeline
-    .Use(new LoggingMiddleware())
-    .Use(new StaticFileMiddleware())
-    .Use(new CustomMiddleware());
+Example:
 
-var service = new HttpListenerService(prefixes, pipeline);
-await service.RunAsync();
-```
+````csharp
+[HttpPut("/api/users/{id}")]
+public IActionResult UpdateUser(int id, [FromBody] UserUpdateDto dto)
+{
+    // Update logic
+    return Ok();
+}
+````
 
----
+## Diagram
 
-## Execution Order
-
-Middleware is executed in the order it is added to the pipeline:
-
-1. Incoming requests flow **down** the pipeline.
-2. Outgoing responses flow **up** the pipeline.
-
-For example:
-
-```
-Request ---> LoggingMiddleware ---> StaticFileMiddleware ---> CustomMiddleware ---> FinalHandler
-Response <--- LoggingMiddleware <--- StaticFileMiddleware <--- CustomMiddleware <--- FinalHandler
-```
+The diagram below illustrates the flow of a request through the Synnovation Web Framework. It provides a high-level
+overview of how different components interact during the lifecycle of an HTTP request.
 
 ---
+![output.png](../output.png)
 
-## Benefits of the Middleware System
+### Components and Flow
 
-1. **Modularity:** Each middleware handles a specific responsibility.
-2. **Reusability:** Middleware can be reused across different applications.
-3. **Scalability:** Add or remove middleware without affecting the rest of the pipeline.
-4. **Flexibility:** Developers can define custom behaviors at various stages of request and response handling.
+1. **Http Listener**  
+   The entry point of the framework. It listens for incoming HTTP requests over a TCP connection, parses the raw request
+   data into a structured `HttpRequest` object, and forwards it to the middleware pipeline.
 
----
+2. **Middleware Pipeline**  
+   This is a sequence of middleware components that can inspect, modify, or short-circuit the request/response cycle.
+   Examples include:
+    - **LoggingMiddleware**: Logs incoming requests and outgoing responses.
+    - **AuthenticationMiddleware**: Checks for valid authentication headers for secured routes.
 
-## Summary
+3. **Route Handler**  
+   Matches the incoming request (method and path) to the appropriate route defined in the `RouteTable`. Once a match is
+   found, it invokes the corresponding controller action, passing in any required parameters (e.g., route placeholders
+   or JSON body).
 
-- Middleware is a powerful mechanism in the **Synnovation WebFramework** for processing HTTP requests and responses.
-- Developers can leverage built-in middleware like `LoggingMiddleware` and `StaticFileMiddleware` or create custom
-  middleware.
-- Use the `MiddlewarePipeline` to compose and manage middleware components in the desired order.
+4. **Controller**  
+   Executes the matched action. Depending on the type of controller:
+    - **MVC Controllers** (`MvcControllerBase`): Render HTML views via the `ViewEngine`.
+    - **API Controllers** (`ApiControllerBase`): Return structured responses, such as JSON or status codes (e.g., `Ok`,
+      `BadRequest`).
+
+5. **Http Response**  
+   Constructs the final response object with headers, status codes, and content. This response is sent back to the Http
+   Listener for delivery to the client.
+
+6. **Client**  
+   Receives the final HTTP response.
+
+Sounds simple, right? I'd like to thank Lars Willemsen for the support in this project. It was a very interesting
+insightful project.

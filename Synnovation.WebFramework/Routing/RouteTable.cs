@@ -8,7 +8,7 @@ public class RouteTable
     private static readonly Lazy<RouteTable> _instance = new(() => new RouteTable());
     public static RouteTable Instance => _instance.Value;
 
-    public List<RouteConfig> Routes { get; } = new();
+    public List<RouteConfig> Routes { get; } = [];
 
     private RouteTable() { }
 

@@ -15,7 +15,7 @@ public class ViewData
 
     public object this[string key]
     {
-        get => Data.ContainsKey(key) ? Data[key] : null!;
+        get => Data.TryGetValue(key, out var value) ? value : null!;
         set => Data[key] = value;
     }
 }
