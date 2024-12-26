@@ -51,6 +51,12 @@ public class WebAppBuilder
         return this;
     }
 
+    public WebAppBuilder UseFormParserMiddleware()
+    {
+        _middleware.Use(new FormParserMiddleware());
+        return this;
+    }
+
     public void Run()
     {
         var listener = new HttpListenerService(_prefixes, _middleware);

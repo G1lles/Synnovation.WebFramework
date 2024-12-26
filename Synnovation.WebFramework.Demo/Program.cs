@@ -14,6 +14,7 @@ internal class Program
             .UseStaticFiles()
             .UseLoggingMiddleware()
             .UseAuthenticationMiddleware()
+            .UseFormParserMiddleware()
             .Run();
     }
 }

@@ -1,4 +1,5 @@
 using Synnovation.WebFramework.Core.Middleware;
+using Synnovation.WebFramework.Exceptions;
 using Synnovation.WebFramework.Routing;
 
 namespace Synnovation.WebFramework.Core;
@@ -30,7 +31,23 @@ public class HttpListenerService
             try
             {
                 // Middleware pipeline invocation
-                response = await _middleware.InvokeAsync(request, context => Task.FromResult(RouteHandler.HandleRequest(context)));
+                response = await _middleware.InvokeAsync(
+                    request,
+                    context => Task.FromResult(RouteHandler.HandleRequest(context))
+                );
+            }
+            catch (RouteNotFoundException ex)
+            {
+                // 404 for custom route not found
+                response = new HttpResponse(404, ex.Message);
+            }
+            catch (ControllerNotFoundException ex)
+            {
+                response = new HttpResponse(500, ex.Message);
+            }
+            catch (ActionNotFoundException ex)
+            {
+                response = new HttpResponse(500, ex.Message);
             }
             catch (Exception ex)
             {

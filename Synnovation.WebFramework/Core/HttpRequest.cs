@@ -9,6 +9,8 @@ public class HttpRequest
     public Dictionary<string, string> QueryParameters { get; set; } = new();
     public Dictionary<string, string> Headers { get; set; } = new();
 
+    public Dictionary<string, string> Form { get; set; } = new();
+    
     public static HttpRequest Parse(string requestString)
     {
         var request = new HttpRequest();

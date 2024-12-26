@@ -22,5 +22,17 @@
     {{/foreach}}
 </ul>
 {{/if}}
+
+<h1>Create a New User</h1>
+<form method="post" action="/create-user">
+    <label>Name:</label>
+    <input type="text" name="Name"/>
+    <br/><br/>
+    <label>Age:</label>
+    <input type="number" name="Age"/>
+    <br/><br/>
+    <button type="submit">Submit</button>
+</form>
+
 </body>
 </html>
