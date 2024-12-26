@@ -12,9 +12,9 @@ public class HttpListenerService
     private readonly CustomHttpListener _listener;
     private readonly MiddlewarePipeline _middleware;
 
-    public HttpListenerService(string[] prefixes, MiddlewarePipeline middleware)
+    public HttpListenerService(string prefixes, MiddlewarePipeline middleware)
     {
-        var port = int.Parse(prefixes[0].Split(':')[2].TrimEnd('/'));
+        var port = int.Parse(prefixes.Split(':')[2].TrimEnd('/'));
         _listener = new CustomHttpListener(port);
         _middleware = middleware;
     }

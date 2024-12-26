@@ -12,13 +12,13 @@ namespace Synnovation.WebFramework.Builder;
 public class WebAppBuilder
 {
     private readonly MiddlewarePipeline _middleware = new();
-    private readonly string[] _prefixes;
+    private readonly string _launchUrl;
 
-    public WebAppBuilder(string[] prefixes)
+    public WebAppBuilder(string launchUrl)
     {
-        if (prefixes == null || prefixes.Length == 0)
+        if (string.IsNullOrEmpty(launchUrl))
             throw new ArgumentException("You must specify at least one prefix for the application.");
-        _prefixes = prefixes;
+        _launchUrl = launchUrl;
     }
 
     public WebAppBuilder AutoRegisterControllers(Assembly assembly)
@@ -59,7 +59,7 @@ public class WebAppBuilder
 
     public void Run()
     {
-        var listener = new HttpListenerService(_prefixes, _middleware);
+        var listener = new HttpListenerService(_launchUrl, _middleware);
         listener.RunAsync().GetAwaiter().GetResult();
     }
 }
