@@ -99,7 +99,7 @@ The diagram below illustrates the flow of a request through the Synnovation Web 
 overview of how different components interact during the lifecycle of an HTTP request.
 
 ---
-![output.png](../output.png)
+![diagram.png](../assets/diagram.png)
 
 ### Components and Flow
 
