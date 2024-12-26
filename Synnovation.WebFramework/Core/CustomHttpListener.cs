@@ -30,7 +30,7 @@ public class CustomHttpListener
         }
     }
 
-    private async Task HandleClientAsync(TcpClient client, Func<HttpRequest, Task<HttpResponse>> requestHandler)
+    private static async Task HandleClientAsync(TcpClient client, Func<HttpRequest, Task<HttpResponse>> requestHandler)
     {
         client.ReceiveTimeout = 5000;
         client.SendTimeout = 5000;
@@ -74,7 +74,7 @@ public class CustomHttpListener
         }
     }
 
-    private async Task SendResponseAsync(NetworkStream stream, HttpResponse response)
+    private static async Task SendResponseAsync(NetworkStream stream, HttpResponse response)
     {
         var responseBytes = Encoding.UTF8.GetBytes(response.ToString());
         await stream.WriteAsync(responseBytes);

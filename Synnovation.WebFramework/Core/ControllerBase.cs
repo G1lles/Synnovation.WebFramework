@@ -9,7 +9,7 @@ public abstract class ControllerBase
 {
     protected ViewData ViewData { get; } = new();
 
-    protected string Json(object data)
+    protected static string Json(object data)
     {
         return System.Text.Json.JsonSerializer.Serialize(data);
     }
