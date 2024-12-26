@@ -2,15 +2,16 @@ namespace Synnovation.WebFramework.Core;
 
 public class HttpRequest
 {
-    public string Method { get; set; }
-    public string Path { get; set; }
-    public string Body { get; set; }
-    
+    public string Method { get; set; } = "";
+    public string Path { get; set; } = "";
+    public string Body { get; set; } = "";
+
     public Dictionary<string, string> QueryParameters { get; set; } = new();
     public Dictionary<string, string> Headers { get; set; } = new();
 
+    // Optional form dictionary if using form parsing
     public Dictionary<string, string> Form { get; set; } = new();
-    
+
     public static HttpRequest Parse(string requestString)
     {
         var request = new HttpRequest();
@@ -20,6 +21,7 @@ public class HttpRequest
         var requestLine = lines[0].Split(' ');
         request.Method = requestLine[0];
         request.Path = requestLine[1];
+
         if (request.Path.Contains('?'))
         {
             var parts = request.Path.Split('?');
@@ -27,12 +29,14 @@ public class HttpRequest
             foreach (var kv in parts[1].Split('&'))
             {
                 var kvParts = kv.Split('=');
-                request.QueryParameters[kvParts[0]] = kvParts[1];
+                if (kvParts.Length == 2)
+                    request.QueryParameters[kvParts[0]] = kvParts[1];
             }
         }
 
         // Parse headers
         var headerEndIndex = Array.IndexOf(lines, "");
+        if (headerEndIndex < 0) headerEndIndex = lines.Length; // fallback
         for (var i = 1; i < headerEndIndex; i++)
         {
             var headerParts = lines[i].Split(": ", 2, StringSplitOptions.RemoveEmptyEntries);

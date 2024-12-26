@@ -3,10 +3,10 @@ using Synnovation.WebFramework.Core;
 
 namespace Synnovation.WebFramework.Demo.Controllers;
 
-public class HelloController : ControllerBase
+public class DemoController : MvcControllerBase
 {
     // GET /Index (no [HttpGet] attribute -> defaults to GET "/Index")
-    public string Index()
+    public IActionResult Index()
     {
         ViewData["Title"] = "Synnovation .NET";
         ViewData["Message"] = "This is a dynamically rendered view (from Index).";
@@ -19,12 +19,12 @@ public class HelloController : ControllerBase
             "Feature 4: DI Container (Scoped)"
         };
 
-        return View("Hello");
+        return View("index");
     }
 
     // GET /view
     [HttpGet("/view")]
-    public string ViewExample()
+    public IActionResult ViewExample()
     {
         ViewData["Title"] = "Synnovation .NET";
         ViewData["Message"] = "This is a dynamically rendered view (from ViewExample).";
@@ -36,16 +36,16 @@ public class HelloController : ControllerBase
             "Feature 3: Views"
         };
 
-        return View("Hello");
+        return View("index");
     }
 
     [HttpPost("/create-user")]
-    public string CreateUser()
+    public IActionResult CreateUser()
     {
-        var name = Request.Form.GetValueOrDefault("Name") ?? "(No Name Provided)";
-        var ageString = Request.Form.GetValueOrDefault("Age") ?? "0";
+        var name = Request?.Form.GetValueOrDefault("Name") ?? "(No Name Provided)";
+        var ageString = Request?.Form.GetValueOrDefault("Age") ?? "0";
 
-        int.TryParse(ageString, out int age);
+        int.TryParse(ageString, out var age);
 
         ViewData["Title"] = "User Created Successfully";
         ViewData["Message"] = "You have posted new user data!";
@@ -56,11 +56,11 @@ public class HelloController : ControllerBase
     }
 
     [Authorize]
-    public string Protected()
+    public IActionResult Protected()
     {
         ViewData["Title"] = "Protected Content";
         ViewData["Message"] = "Only authorized users can see this!";
-        return View("Hello");
+        return View("index");
     }
 }
 

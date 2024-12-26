@@ -16,3 +16,33 @@ Accept: application/json
 GET http://localhost:5000/protected
 Accept: application/json
 Authorization: "Bearer Token"
+
+### API: GET ALL USERS
+GET http://localhost:5000/api/users
+Accept: application/json
+
+### API: GET SPECIFIC USER
+GET http://localhost:5000/api/users/1
+Accept: application/json
+
+### API: CREATE NEW USER
+POST http://localhost:5000/api/users
+Accept: application/json
+Content-Type: application/json
+
+{
+  "Name": "Ttest"
+}
+
+### API: UPDATE USER
+PUT http://localhost:5000/api/users/1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "Name": "Gilles"
+}
+
+### API: DELETE SPECIFIC USER
+DELETE http://localhost:5000/api/users/1
+Accept: application/json

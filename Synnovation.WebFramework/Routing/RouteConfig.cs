@@ -9,12 +9,14 @@ public class RouteConfig
     public string HttpMethod { get; set; }
     public Type ControllerType { get; set; }
     public string ActionName { get; set; }
-    public List<string> ParameterNames { get; set; } = [];
-
+    public List<string> ParameterNames { get; set; } = new();
     public bool RequiresAuthorization { get; }
 
-
-    public RouteConfig(string path, string httpMethod, Type controllerType, string actionName,
+    public RouteConfig(
+        string path,
+        string httpMethod,
+        Type controllerType,
+        string actionName,
         bool requiresAuthorization)
     {
         Path = path.ToLowerInvariant();
@@ -23,7 +25,7 @@ public class RouteConfig
         ActionName = actionName;
         RequiresAuthorization = requiresAuthorization;
 
-        // Extract parameters from path (e.g., /user/{id})
+        // Identify {param} placeholders in the path
         foreach (var segment in path.Split('/'))
         {
             if (segment.StartsWith('{') && segment.EndsWith('}'))

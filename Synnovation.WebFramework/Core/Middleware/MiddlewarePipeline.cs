@@ -15,7 +15,7 @@ public class MiddlewarePipeline
 
     public async Task<HttpResponse> InvokeAsync(HttpRequest request, Func<HttpRequest, Task<HttpResponse>> finalHandler)
     {
-        // Create a middleware chain by linking each middleware to the next
+        // Build chain: create a middleware chain by linking each middleware to the next
         var next = finalHandler;
 
         for (var i = _middlewares.Count - 1; i >= 0; i--)

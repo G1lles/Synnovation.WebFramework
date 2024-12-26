@@ -14,15 +14,16 @@ public static partial class ViewEngine
 
         var viewContent = File.ReadAllText(viewPath);
 
-        // Process conditional rendering
+        // Conditionals, loops, placeholders, etc.
         viewContent = ProcessConditionals(viewContent, viewData);
-
-        // Process loops
         viewContent = ProcessLoops(viewContent, viewData);
 
-        // Replace placeholders
-        return viewData.Data.Keys.Aggregate(viewContent, (current, key) =>
-            current.Replace($"{{{{ {key} }}}}", viewData.Data[key].ToString() ?? string.Empty));
+        foreach (var key in viewData.Data.Keys)
+        {
+            viewContent = viewContent.Replace($"{{{{ {key} }}}}", viewData.Data[key]?.ToString() ?? "");
+        }
+
+        return viewContent;
     }
 
     private static string ProcessConditionals(string content, ViewData viewData)
@@ -33,13 +34,14 @@ public static partial class ViewEngine
             var condition = match.Groups[1].Value.Trim();
             var innerContent = match.Groups[2].Value;
 
-            if (viewData.Data.TryGetValue(condition, out var conditionValue) && conditionValue is bool boolValue &&
-                boolValue)
+            if (viewData.Data.TryGetValue(condition, out var conditionValue)
+                && conditionValue is bool boolValue
+                && boolValue)
             {
                 return innerContent;
             }
 
-            return string.Empty; // If condition is false, remove the content
+            return "";
         });
     }
 
@@ -52,9 +54,11 @@ public static partial class ViewEngine
             var collectionName = match.Groups[2].Value.Trim();
             var innerContent = match.Groups[3].Value;
 
-            if (!viewData.Data.TryGetValue(collectionName, out var collectionValue) ||
-                collectionValue is not IEnumerable<object> collection)
-                return string.Empty; // If collection is null or empty
+            if (!viewData.Data.TryGetValue(collectionName, out var collectionValue)
+                || collectionValue is not IEnumerable<object> collection)
+            {
+                return "";
+            }
 
             var renderedContent = new StringWriter();
             foreach (var item in collection)

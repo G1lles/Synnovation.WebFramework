@@ -12,37 +12,37 @@ public static class RouteScanner
     public static void RegisterRoutesFromAssembly(RouteTable routeTable, Assembly assembly)
     {
         var controllers = assembly.GetTypes()
-            .Where(type => typeof(ControllerBase).IsAssignableFrom(type) && !type.IsAbstract);
+            .Where(type => 
+                (typeof(MvcControllerBase).IsAssignableFrom(type) 
+                 || typeof(ApiControllerBase).IsAssignableFrom(type)) 
+                && !type.IsAbstract);
 
         foreach (var controller in controllers)
         {
             var methods = controller.GetMethods(BindingFlags.Instance | BindingFlags.Public);
-
             foreach (var method in methods)
             {
                 var httpVerbAttributes = method.GetCustomAttributes<HttpVerbAttribute>().ToList();
-
-                if (httpVerbAttributes.Count != 0)
+                if (httpVerbAttributes.Count > 0)
                 {
-                    foreach (var httpVerbAttribute in httpVerbAttributes)
+                    foreach (var verbAttr in httpVerbAttributes)
                     {
-                        var path = httpVerbAttribute.Path;
-
-                        var httpMethod = httpVerbAttribute.GetType().Name
-                            .Replace("Http", "").Replace("Attribute", "").ToUpper();
+                        var path = verbAttr.Path;
+                        var httpMethod = verbAttr.GetType().Name
+                            .Replace("Http", "")
+                            .Replace("Attribute", "")
+                            .ToUpperInvariant();
 
                         var requiresAuthorization = method.GetCustomAttribute<AuthorizeAttribute>() != null;
-
                         routeTable.AddRoute(path, httpMethod, controller, method.Name, requiresAuthorization);
                     }
                 }
                 else
                 {
+                    // default GET /MethodName
                     var path = $"/{method.Name}";
-                    const string httpMethod = "GET";
                     var requiresAuthorization = method.GetCustomAttribute<AuthorizeAttribute>() != null;
-
-                    routeTable.AddRoute(path, httpMethod, controller, method.Name, requiresAuthorization);
+                    routeTable.AddRoute(path, "GET", controller, method.Name, requiresAuthorization);
                 }
             }
         }
