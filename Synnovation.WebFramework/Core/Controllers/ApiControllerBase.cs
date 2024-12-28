@@ -12,7 +12,7 @@ public abstract class ApiControllerBase
     /// </summary>
     protected IActionResult Ok(object? data = null)
     {
-        return new JsonResult(data, 200);
+        return new JsonResult(data, 200); // Keep this even it is redundant, you never know.
     }
 
     /// <summary>

@@ -1,6 +1,4 @@
 using Synnovation.WebFramework.Builder;
-using Synnovation.WebFramework.Core.Middleware;
-using Synnovation.WebFramework.Core.Middleware.Implementations;
 using Synnovation.WebFramework.Demo.Middleware;
 
 namespace Synnovation.WebFramework.Demo;
