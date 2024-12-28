@@ -131,5 +131,41 @@ overview of how different components interact during the lifecycle of an HTTP re
 6. **Client**  
    Receives the final HTTP response.
 
-Sounds simple, right? I'd like to thank Lars Willemsen for the support in this project. It was a very interesting
-insightful project.
+### HTML Placeholders
+
+**ViewData values**
+
+```html
+{{ Key }}
+```
+
+* A placeholder is used to insert dynamic data from the `ViewData` dictionary into your HTML file.
+* The `Key` corresponds to a property or key in `ViewData`
+
+Example:
+
+```html
+<p>Welcome, {{ Username }}!</p>
+```
+
+**Conditionals**
+
+```html
+{{#if IsLoggedIn}}
+<p>Welcome back!</p>
+{{/if}}
+```
+
+**Loops**
+
+````html
+
+<ul>
+    {{#foreach Item in Items}}
+    <li>{{ Item }}</li>
+    {{/foreach}}
+</ul>
+````
+
+Sounds simple, right? I'd like to thank Lars Willemsen for the support in this project. It was a very fun, interesting,
+and insightful project.
