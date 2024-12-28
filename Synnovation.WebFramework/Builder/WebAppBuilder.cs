@@ -14,6 +14,11 @@ public class WebAppBuilder
     private readonly MiddlewarePipeline _middleware = new();
     private readonly string _launchUrl;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WebAppBuilder"/> class.
+    /// </summary>
+    /// <param name="launchUrl">The URL the application should listen to.</param>
+    /// <exception cref="ArgumentException">Thrown when the provided URL is null or empty.</exception>
     public WebAppBuilder(string launchUrl)
     {
         if (string.IsNullOrEmpty(launchUrl))
@@ -21,12 +26,39 @@ public class WebAppBuilder
         _launchUrl = launchUrl;
     }
 
+    /// <summary>
+    /// Builds and runs the application.
+    /// </summary>
+    /// <remarks>
+    /// This method initializes the HTTP listener service with the configured middleware and begins listening for incoming requests.
+    /// </remarks>
+    public void Run()
+    {
+        var listener = new HttpListenerService(_launchUrl, _middleware);
+
+        // Waits for the completion of the given task
+        listener.RunAsync().GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Automatically registers all controllers in the specified assembly.
+    /// </summary>
+    /// <param name="assembly">The assembly to scan for controllers.</param>
+    /// <returns>The current <see cref="WebAppBuilder"/> instance for method chaining.</returns>
     public WebAppBuilder AutoRegisterControllers(Assembly assembly)
     {
         RouteScanner.RegisterRoutesFromAssembly(RouteTable.Instance, assembly);
         return this;
     }
 
+    /// <summary>
+    /// Allows manual configuration of the middleware pipeline.
+    /// </summary>
+    /// <param name="configureMiddleware">
+    /// An action that receives the <see cref="MiddlewarePipeline"/> to allow middleware customization.
+    /// </param>
+    /// Example usage: .ConfigureMiddleware(pipeline => { pipeline.Use(new Middleware()); }
+    /// <returns>The current <see cref="WebAppBuilder"/> instance for method chaining.</returns>
     public WebAppBuilder ConfigureMiddleware(Action<MiddlewarePipeline> configureMiddleware)
     {
         configureMiddleware(_middleware);
@@ -55,11 +87,5 @@ public class WebAppBuilder
     {
         _middleware.Use(new FormParserMiddleware());
         return this;
-    }
-
-    public void Run()
-    {
-        var listener = new HttpListenerService(_launchUrl, _middleware);
-        listener.RunAsync().GetAwaiter().GetResult();
     }
 }

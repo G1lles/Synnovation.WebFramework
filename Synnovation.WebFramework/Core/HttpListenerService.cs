@@ -9,8 +9,8 @@ namespace Synnovation.WebFramework.Core;
 /// </summary>
 public class HttpListenerService
 {
-    private readonly CustomHttpListener _listener;
-    private readonly MiddlewarePipeline _middleware;
+    private readonly CustomHttpListener _listener; // Listens for incoming HTTP requests on our specified port
+    private readonly MiddlewarePipeline _middleware; // Manages the sequence of our middleware pipeline
 
     public HttpListenerService(string prefixes, MiddlewarePipeline middleware)
     {
@@ -19,6 +19,9 @@ public class HttpListenerService
         _middleware = middleware;
     }
 
+    /// <summary>
+    /// Starts the server and listens for incoming HTTP requests.
+    /// </summary>
     public async Task RunAsync()
     {
         _listener.Start();
@@ -30,7 +33,8 @@ public class HttpListenerService
 
             try
             {
-                // Middleware pipeline invocation
+                // Pass the request through the middleware pipeline.
+                // If middleware completes, call RouteHandler to handle the request.
                 response = await _middleware.InvokeAsync(
                     request,
                     context => Task.FromResult(RouteHandler.HandleRequest(context))
@@ -38,7 +42,6 @@ public class HttpListenerService
             }
             catch (RouteNotFoundException ex)
             {
-                // 404 for custom route not found
                 response = new HttpResponse(404, ex.Message);
             }
             catch (ControllerNotFoundException ex)
@@ -59,6 +62,9 @@ public class HttpListenerService
         });
     }
 
+    /// <summary>
+    /// Stops the HTTP listener.
+    /// </summary>
     public void Stop()
     {
         _listener.Stop();

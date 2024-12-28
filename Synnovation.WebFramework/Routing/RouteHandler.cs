@@ -4,160 +4,171 @@ using Synnovation.WebFramework.Annotations;
 using Synnovation.WebFramework.Core;
 using Synnovation.WebFramework.Core.Controllers;
 using Synnovation.WebFramework.Core.Types;
+using Synnovation.WebFramework.Exceptions;
 
-namespace Synnovation.WebFramework.Routing
+namespace Synnovation.WebFramework.Routing;
+
+/// <summary>
+/// Handles routing and delegates requests to the appropriate controller and action method.
+/// </summary>
+public static class RouteHandler
 {
-    public static class RouteHandler
+    /// <summary>
+    /// Matches a request to a route, invokes the appropriate controller and action, and returns a response.
+    /// </summary>
+    public static HttpResponse HandleRequest(HttpRequest request)
     {
-        public static HttpResponse HandleRequest(HttpRequest request)
+        // Here we match the request to a route based on path and HTTP method
+        var matchedRoute = RouteTable.Instance.Routes.FirstOrDefault(r =>
+            MatchPath(r.Path, request.Path) &&
+            r.HttpMethod.Equals(request.Method, StringComparison.OrdinalIgnoreCase));
+
+        if (matchedRoute == null)
         {
-            var matchedRoute = RouteTable.Instance.Routes.FirstOrDefault(r =>
-                MatchPath(r.Path, request.Path) &&
-                r.HttpMethod.Equals(request.Method, StringComparison.OrdinalIgnoreCase));
-
-            if (matchedRoute == null)
-            {
-                // 404 or throw custom exception
-                return new HttpResponse(404, "Route not found");
-            }
-
-            var controller = Activator.CreateInstance(matchedRoute.ControllerType);
-            if (controller == null)
-            {
-                return new HttpResponse(500, "Controller not found");
-            }
-
-            var actionMethod = matchedRoute.ControllerType.GetMethod(matchedRoute.ActionName);
-            if (actionMethod == null)
-            {
-                return new HttpResponse(500, "Action method not found");
-            }
-
-            // If it's a controller base, set the request property
-            if (controller is MvcControllerBase mvcCtrl) mvcCtrl.Request = request;
-            if (controller is ApiControllerBase apiCtrl) apiCtrl.Request = request;
-
-            // Bind parameters
-            var parameters = BindParameters(matchedRoute, request, actionMethod);
-
-            // Invoke
-            var result = actionMethod.Invoke(controller, parameters);
-
-            // If result is IActionResult => produce HttpResponse
-            if (result is IActionResult actionResult)
-            {
-                return actionResult.ExecuteResult();
-            }
-
-            // Fallback => string => text/html
-            var stringBody = result?.ToString() ?? "";
-            return new HttpResponse(200, stringBody) { ContentType = "text/html" };
+            // 404 or throw custom exception
+            throw new RouteNotFoundException("Route not found");
         }
 
-        private static object[] BindParameters(RouteConfig route, HttpRequest request, MethodInfo method)
+        // We instantiate the specified controller for the matched route
+        var controller = Activator.CreateInstance(matchedRoute.ControllerType);
+        if (controller == null)
         {
-            // e.g. method might have signature: public IActionResult Update(int id, [FromBody] CreateUserDto body)
-            var paramInfos = method.GetParameters();
-            var boundParams = new object[paramInfos.Length];
+            throw new ControllerNotFoundException("Controller not found");
+        }
 
-            // Split route path / request path
-            var routeSegments = route.Path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            var requestSegments = request.Path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        // Find the action method in the controller for the matched route.
+        var actionMethod = matchedRoute.ControllerType.GetMethod(matchedRoute.ActionName);
+        if (actionMethod == null)
+        {
+            throw new ActionNotFoundException("Action not found");
+        }
 
-            var routeParamIndex = 0; // track how many placeholders we've used
+        // Pass the HttpRequest to the controller instance.
+        if (controller is MvcControllerBase mvcCtrl) mvcCtrl.Request = request;
+        if (controller is ApiControllerBase apiCtrl) apiCtrl.Request = request;
 
-            for (var i = 0; i < paramInfos.Length; i++)
+        // Bind parameters for the action method (e.g., route placeholders, JSON body).
+        var parameters = BindParameters(matchedRoute, request, actionMethod);
+
+        // Invoke the action method and capture the result.
+        var result = actionMethod.Invoke(controller, parameters);
+
+        // Convert the action result to an HttpResponse.
+        if (result is IActionResult actionResult)
+        {
+            return actionResult.ExecuteResult();
+        }
+
+        // Fallback => string => text/html
+        var stringBody = result?.ToString() ?? "";
+        return new HttpResponse(200, stringBody) { ContentType = "text/html" };
+    }
+
+    /// <summary>
+    /// Matches placeholders in the route to request parameters or body data.
+    /// </summary>
+    private static object[] BindParameters(RouteConfig route, HttpRequest request, MethodInfo method)
+    {
+        var paramInfos = method.GetParameters();
+        var boundParams = new object[paramInfos.Length];
+
+        var routeSegments = route.Path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var requestSegments = request.Path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+        var routeParamIndex = 0;
+
+        for (var i = 0; i < paramInfos.Length; i++)
+        {
+            var pInfo = paramInfos[i];
+            var hasFromBody = pInfo.GetCustomAttribute<FromBodyAttribute>() != null;
+            var hasFromQuery = pInfo.GetCustomAttribute<FromQueryAttribute>() != null;
+
+            if (hasFromBody)
             {
-                var pInfo = paramInfos[i];
-                var hasFromBody = pInfo.GetCustomAttribute<FromBodyAttribute>() != null;
-
-                if (hasFromBody)
+                // Parse the body for [FromBody]
+                var bodyJson = request.Body;
+                boundParams[i] = string.IsNullOrWhiteSpace(bodyJson)
+                    ? GetDefaultValue(pInfo.ParameterType)!
+                    : JsonSerializer.Deserialize(bodyJson, pInfo.ParameterType) ??
+                      GetDefaultValue(pInfo.ParameterType)!;
+            }
+            else if (hasFromQuery)
+            {
+                // Parse query parameters for [FromQuery]
+                if (request.QueryParameters.TryGetValue(pInfo.Name ?? "", out var queryValue) &&
+                    !string.IsNullOrWhiteSpace(queryValue))
                 {
-                    // 1. If param is [FromBody], parse JSON from request.Body
-                    var bodyJson = request.Body;
-                    if (string.IsNullOrWhiteSpace(bodyJson))
-                    {
-                        boundParams[i] = GetDefaultValue(pInfo.ParameterType);
-                    }
-                    else
-                    {
-                        try
-                        {
-                            var deserialized = JsonSerializer.Deserialize(bodyJson, pInfo.ParameterType);
-                            boundParams[i] = deserialized ?? GetDefaultValue(pInfo.ParameterType);
-                        }
-                        catch
-                        {
-                            // Could handle bad JSON => 400 or throw
-                            throw new Exception("Invalid JSON in request body.");
-                        }
-                    }
+                    boundParams[i] = ConvertToType(queryValue, pInfo.ParameterType)!;
                 }
                 else
                 {
-                    // 2. Otherwise, see if the route path has a placeholder for this param
-                    // Example: /api/users/{id} => requestSegments[2] might be "5"
-                    // We'll assume the param is the next placeholder in routeSegments
-                    // i.e. "api", "users", "{id}" => segment index 2 => "5"
-
-                    // We'll find which route segment is a placeholder
-                    // routeParamIndex is how many placeholders we've bound so far
-                    // so let’s incrementally find the next {placeholder}.
-                    var placeholders = routeSegments
-                        .Where(seg => seg.StartsWith('{') && seg.EndsWith('}'))
-                        .ToList();
-
-                    if (routeParamIndex < placeholders.Count)
-                    {
-                        // find the index of that placeholder in routeSegments
-                        var placeholderSegment = placeholders[routeParamIndex]; // e.g. "{id}"
-                        var placeholderIndex = Array.IndexOf(routeSegments, placeholderSegment);
-
-                        var rawValue = requestSegments[placeholderIndex]; // e.g. "2"
-
-                        // Convert rawValue => correct type
-                        boundParams[i] = ConvertToType(rawValue, pInfo.ParameterType);
-                        routeParamIndex++;
-                    }
-                    else
-                    {
-                        boundParams[i] = GetDefaultValue(pInfo.ParameterType);
-                    }
+                    // Use default value if query parameter is missing
+                    boundParams[i] = GetDefaultValue(pInfo.ParameterType)!;
                 }
             }
-
-            return boundParams;
-        }
-
-        private static object? ConvertToType(string rawValue, Type targetType)
-        {
-            if (targetType != typeof(int)) return rawValue;
-            
-            if (int.TryParse(rawValue, out var intVal))
+            else
             {
-                return intVal;
+                // Handle route placeholders (e.g., {id})
+                var placeholders = routeSegments
+                    .Where(seg => seg.StartsWith('{') && seg.EndsWith('}'))
+                    .ToList();
+
+                if (routeParamIndex < placeholders.Count)
+                {
+                    var placeholderSegment = placeholders[routeParamIndex];
+                    var placeholderIndex = Array.IndexOf(routeSegments, placeholderSegment);
+
+                    var rawValue = requestSegments[placeholderIndex];
+                    boundParams[i] = ConvertToType(rawValue, pInfo.ParameterType)!;
+                    routeParamIndex++;
+                }
+                else
+                {
+                    boundParams[i] = GetDefaultValue(pInfo.ParameterType)!;
+                }
             }
-
-            throw new Exception($"Expected an int but got '{rawValue}'");
         }
 
-        private static object? GetDefaultValue(Type t)
+        return boundParams;
+    }
+
+
+    private static object? ConvertToType(string rawValue, Type targetType)
+    {
+        if (targetType == typeof(int) && int.TryParse(rawValue, out var intVal))
         {
-            return t.IsValueType ? Activator.CreateInstance(t) : null;
+            return intVal;
         }
 
-        private static bool MatchPath(string routePath, string requestPath)
+        if (targetType == typeof(bool) && bool.TryParse(rawValue, out var boolVal))
         {
-            var routeSegs = routePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            var reqSegs = requestPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-
-            if (routeSegs.Length != reqSegs.Length)
-                return false;
-
-            return !routeSegs.Where((t, i) =>
-                    (!t.StartsWith('{') || !t.EndsWith('}')) &&
-                    !t.Equals(reqSegs[i], StringComparison.OrdinalIgnoreCase))
-                .Any();
+            return boolVal;
         }
+
+        if (targetType == typeof(string))
+        {
+            return rawValue;
+        }
+
+        throw new Exception($"Cannot convert value '{rawValue}' to type {targetType.Name}.");
+    }
+
+    private static object? GetDefaultValue(Type t)
+    {
+        return t.IsValueType ? Activator.CreateInstance(t) : null;
+    }
+
+    private static bool MatchPath(string routePath, string requestPath)
+    {
+        var routeSegs = routePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var reqSegs = requestPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+        if (routeSegs.Length != reqSegs.Length)
+            return false;
+
+        return !routeSegs.Where((t, i) =>
+                (!t.StartsWith('{') || !t.EndsWith('}')) &&
+                !t.Equals(reqSegs[i], StringComparison.OrdinalIgnoreCase))
+            .Any();
     }
 }
