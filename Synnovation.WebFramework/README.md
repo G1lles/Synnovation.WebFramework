@@ -1,7 +1,9 @@
 # Synnovation Web Framework
 
-Synnovation Web Framework is a lightweight, modular .NET web framework designed for educational and practical purposes.
+Synnovation Web Framework is a lightweight, modular .NET web framework designed for educational purposes.
 It offers MVC and REST API capabilities with minimal overhead.
+
+Made by **Gilles Claessens**
 
 ## Features
 
@@ -165,6 +167,191 @@ Example:
     <li>{{ Item }}</li>
     {{/foreach}}
 </ul>
+````
+
+### Examples
+
+Build your Synnovation Web. App:
+
+````csharp
+private static void Main(string[] args)
+    {
+        var builder = new WebAppBuilder("http://localhost:5000/");
+
+        builder
+            .AutoRegisterControllers(typeof(Program).Assembly)
+            .ConfigureMiddleware(pipeline => pipeline.Use(new TimingMiddleware())) // Custom middleware
+            .UseStaticFiles()
+            .UseLoggingMiddleware()
+            .UseAuthenticationMiddleware()
+            .UseFormParserMiddleware()
+            .Run();
+    }
+````
+
+Your first MVC controller:
+
+````csharp
+public class DemoController : MvcControllerBase
+{
+    // GET /Index (no [HttpGet] attribute -> defaults to GET "/Index")
+    [HttpGet("/welcome")]
+    public IActionResult Index()
+    {
+        ViewData["Title"] = "Synnovation .NET";
+        ViewData["Message"] = "This is a dynamically rendered view.";
+        ViewData["ShowItems"] = true;
+        ViewData["Items"] = new List<string>
+        {
+            "Feature 1: Routing",
+            "Feature 2: Middleware Pipeline",
+            "Feature 3: Controllers",
+            "Feature 4: View Engine",
+            "Feature 5: DI Parameter Binding"
+        };
+
+        return View("Welcome");
+    }
+
+    [HttpPost("/create-user")]
+    public IActionResult CreateUser()
+    {
+        var name = Request?.Form.GetValueOrDefault("Name") ?? "(No Name Provided)";
+        var ageString = Request?.Form.GetValueOrDefault("Age") ?? "0";
+
+        int.TryParse(ageString, out var age);
+
+        ViewData["Title"] = "User Created Successfully";
+        ViewData["Message"] = "You have posted new user data!";
+        ViewData["Name"] = name;
+        ViewData["Age"] = age;
+
+        return View("SubmitResult");
+    }
+
+    [Authorize]
+    public IActionResult Protected()
+    {
+        ViewData["Title"] = "Protected Content";
+        ViewData["Message"] = "Only authorized users can see this!";
+        return View("Welcome");
+    }
+
+    // GET /users/{id}?includeDetails=true
+    [HttpGet("/users/{id}")]
+    public IActionResult GetUserDetails(int id, [FromQuery] bool includeDetails)
+    {
+        // Simulating
+        var user = new
+        {
+            Id = id,
+            Name = "Test User",
+            Age = 25,
+            Email = "testuser@example.com",
+            Address = "123 Demo Street"
+        };
+
+        ViewData["Title"] = "User Details";
+        ViewData["Message"] = $"Details for User ID: {id}";
+
+        ViewData["Id"] = user.Id;
+        ViewData["Name"] = user.Name;
+        ViewData["Age"] = user.Age;
+
+        if (includeDetails)
+        {
+            ViewData["FullDetails"] = true;
+            ViewData["DetailsMessage"] = "Full details are included.";
+            ViewData["Email"] = user.Email;
+            ViewData["Address"] = user.Address;
+        }
+        else
+        {
+            ViewData["DetailsMessage"] = "Basic details are shown.";
+            ViewData["FullDetails"] = false;
+        }
+
+        return View("UserDetails");
+    }
+}
+````
+
+Your first REST controller:
+
+````csharp
+public class UsersApiController : ApiControllerBase
+{
+    private static readonly ConcurrentDictionary<int, User> _users = new();
+    private static int _nextId = 1;
+
+    // GET /api/users
+    [HttpGet("/api/users")]
+    public IActionResult GetAll()
+    {
+        return Ok(_users.Values);
+    }
+
+    // GET /api/users/{id}
+    [HttpGet("/api/users/{id}")]
+    public IActionResult GetById(int id)
+    {
+        return _users.TryGetValue(id, out var u)
+            ? Ok(u)
+            : NotFound(new { error = "User not found" });
+    }
+
+    // POST /api/users
+    // JSON body => [FromBody] CreateUserDto body
+    [HttpPost("/api/users")]
+    public IActionResult Create([FromBody] CreateUserDto body)
+    {
+        if (string.IsNullOrWhiteSpace(body.Name))
+        {
+            return BadRequest(new { error = "Invalid user data" });
+        }
+
+        var newUser = new User { Id = _nextId++, Name = body.Name };
+        _users[newUser.Id] = newUser;
+        return Created(newUser);
+    }
+
+    // PUT /api/users/{id}
+    [HttpPut("/api/users/{id}")]
+    public IActionResult Update(int id)
+    {
+        var body = ParseJsonBody<CreateUserDto>();
+        if (body == null || string.IsNullOrEmpty(body.Name))
+        {
+            return BadRequest(new { error = "Invalid user data" });
+        }
+
+        if (!_users.ContainsKey(id)) return NotFound(new { error = "User not found" });
+
+        var updatedUser = new User { Id = id, Name = body.Name };
+        _users[id] = updatedUser;
+        return Ok(updatedUser);
+    }
+
+    // DELETE /api/users/{id}
+    [HttpDelete("/api/users/{id}")]
+    public IActionResult Delete(int id)
+    {
+        if (_users.TryRemove(id, out _))
+        {
+            return Ok(new { message = "User deleted" });
+        }
+
+        return NotFound(new { error = "User not found" });
+    }
+}
+
+public class User
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = "";
+}
+
+public record CreateUserDto(string Name);
 ````
 
 Sounds simple, right? I'd like to thank Lars Willemsen for the support in this project. It was a very fun, interesting,
