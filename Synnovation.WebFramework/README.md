@@ -9,7 +9,7 @@ It offers MVC and REST API capabilities with minimal overhead.
 - **Middleware Pipeline**: Chainable middleware for logging, authentication, and more.
 - **Controllers**: Supports both MVC (view rendering) and API (JSON-based) controllers.
 - **View Engine**: Simple templating system for rendering HTML views with placeholders.
-- **Parameter Binding**: Automatically bind route parameters and request bodies (`[FromBody]`).
+- **Parameter Binding**: Automatically bind route parameters and request bodies (`[FromBody]` & `[FromQuery]`).
 
 ## Key Components
 
