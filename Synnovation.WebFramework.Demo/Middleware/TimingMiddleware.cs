@@ -18,9 +18,8 @@ public class TimingMiddleware : MiddlewareBase
         var response = await next(request);
 
         stopwatch.Stop();
-
-        // Add processing time to the response headers
         response.Headers["X-Processing-Time"] = $"{stopwatch.ElapsedMilliseconds} ms";
+        
         Console.WriteLine($"[{DateTime.Now}] Processing time: {response.Headers["X-Processing-Time"]}");
 
         return await next(request);
